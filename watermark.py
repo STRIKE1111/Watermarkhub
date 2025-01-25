@@ -24,45 +24,20 @@ def Injection(CFG, DATA, selected_attributes, domain_groups, indices, domain_gen
                             DATA[selected_attributes[i]] = DATA[selected_attributes[i]].cat.add_categories(list(group)[k])
                         DATA.at[ex, selected_attributes[i]] = list(group)[k]
 
-    # watermarked_data = 'data_output.csv'
-    # DATA.to_csv(watermarked_data, index=False)
     print('Injection completed.\n')
     end_time = time.time()  
     total_time = end_time - start_time  
-    # print(f"Total injection time: {total_time:.2f} seconds")
     return DATA, total_time
 
 
 def modify_dataframe(df, modify_percent):
-    """
-    根据给定的修改比例，对 DataFrame 的部分行进行随机修改。
-    
-    参数:
-    df: 原始 DataFrame
-    modify_percent: 修改的百分比（取值范围: 5, 10, 15, ..., 95）
-    
-    返回:
-    修改后的 DataFrame
-    """
-    # 复制 DataFrame，避免修改原始数据
     df_modified = df.copy()
-    
-    # 计算需要修改的行数
     num_rows = len(df)
     num_modify = int(num_rows * modify_percent / 100)
-    
-    # 随机选择要修改的行的索引
     rows_to_modify = np.random.choice(df.index, size=num_modify, replace=False)
-    
-    # 对选中的行进行修改
     for row in rows_to_modify:
-        # 随机选择该行的一个列进行修改
         col_to_modify = np.random.choice(df.columns)
-        
-        # 生成随机值进行替换，可以根据实际情况改为更具体的值生成策略
-        random_value = np.random.choice(np.arange(1, 10000))  # 生成一个随机数
-        
-        # 修改指定的列的值
+        random_value = np.random.choice(np.arange(1, 10000))  #
         df_modified.at[row, col_to_modify] = random_value
     
     return df_modified
@@ -71,15 +46,12 @@ def modify_dataframe(df, modify_percent):
 def Detection(CFG, watermarked_data, selected_attributes, domain_groups, indices, domain_gen):
     DATA = pd.read_csv(watermarked_data)
     DATA = modify_dataframe(DATA, modify_percent=99)
-    # original_DATA= pd.read_csv(f'parse_data')
-    # DATA = DATA.sample(frac=0.1, random_state=CFG.RANDOM_SEED)
+    
     num_bits = len(CFG.WM)
     Count = np.zeros((num_bits, 2))
     WM_x = np.zeros(num_bits)
     start_time = time.time()
-    # for _, row in tqdm(DATA.iterrows(), total=len(DATA)):
-    #     for index in indices:
-    #         random_values = domain_gen.generate_seed(CFG.PERSONAL_KEY, row.iloc[index])
+    
     for i, row in tqdm(DATA.iterrows(), total=len(DATA)):
         for index in indices:
             # print(f'index: {index}, row.iloc[index]: {row.iloc[index]}')
