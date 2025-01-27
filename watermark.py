@@ -2,10 +2,19 @@ import time
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
+import json
 from pandas.api.types import CategoricalDtype
+
+def custom_serializer(obj):
+    if isinstance(obj, np.int64):
+        return int(obj)  
+    raise TypeError("Type not serializable")
 
 def Injection(CFG, DATA, selected_attributes, domain_groups, indices, domain_gen):
     start_time = time.time()  
+
+    swap_file = "parser_data\code1\swap\swap.json"
+    swap_info = {}
 
     for ex, row in tqdm(DATA.iterrows(), total=len(DATA)):
         for index in indices:
@@ -24,8 +33,14 @@ def Injection(CFG, DATA, selected_attributes, domain_groups, indices, domain_gen
                             DATA[selected_attributes[i]] = DATA[selected_attributes[i]].cat.add_categories(list(group)[k])
                         DATA.at[ex, selected_attributes[i]] = list(group)[k]
 
+                        swap_info[ex] = [v, list(group)[k]]
+
     print('Injection completed.\n')
     end_time = time.time()  
+
+    with open(swap_file, 'w') as f:
+        json.dump(swap_info, f, default=custom_serializer)
+
     total_time = end_time - start_time  
     return DATA, total_time
 
