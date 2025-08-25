@@ -12,7 +12,7 @@ We recommended the following dependencies.
 - langchain==0.2.9
 - langchain-openai==0.1.17
 
-For more recommended dependencies, please refer to the file [`requirements.txt`].
+For more recommended dependencies, please refer to the file [`[requirements.txt]`].
 
 ``` bash
 conda create -n watermark python=3.10.10 -y
